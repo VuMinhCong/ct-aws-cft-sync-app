@@ -1,0 +1,4 @@
+template-file-path: ./cfn-template.yaml
+tags:
+    Name: 'ct-deverlopment-cfn-automated'
+    Project: 'ct-aws-cfn-sync'
