@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'CloudFormation template for Amazon ECR repository'
+Description: 'CloudFormation template for Amazon ECR repository with required permissions'
 
 Parameters:
   RepositoryName:
@@ -8,6 +8,7 @@ Parameters:
     Description: 'Name of the ECR repository'
 
 Resources:
+  # ECR Repository
   ECRRepository:
     Type: AWS::ECR::Repository
     Properties:
@@ -32,6 +33,41 @@ Resources:
               }
             ]
           }
+
+  # IAM Policy for ECR permissions
+  ECRPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy for ECR repository operations
+      ManagedPolicyName: ECRRepositoryAccessPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'ecr:CreateRepository'
+              - 'ecr:DeleteRepository'
+              - 'ecr:DescribeRepositories'
+              - 'ecr:PutLifecyclePolicy'
+              - 'ecr:GetLifecyclePolicy'
+              - 'ecr:DeleteLifecyclePolicy'
+              - 'ecr:TagResource'
+              - 'ecr:UntagResource'
+              - 'ecr:GetAuthorizationToken'
+              - 'ecr:InitiateLayerUpload'
+              - 'ecr:UploadLayerPart'
+              - 'ecr:CompleteLayerUpload'
+              - 'ecr:PutImage'
+              - 'ecr:BatchCheckLayerAvailability'
+              - 'ecr:BatchGetImage'
+            Resource: '*'
+
+  # Attach the policy to the CloudFormation service role
+  RolePolicyAttachment:
+    Type: AWS::IAM::RolePolicyAttachment
+    Properties:
+      PolicyArn: !Ref ECRPolicy
+      RoleName: 'CtCfnSyncGithubRole'
 
 Outputs:
   RepositoryName:
