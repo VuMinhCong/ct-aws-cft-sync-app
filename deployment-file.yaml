@@ -1,11 +1,13 @@
 # ECR Repository for Docker images
-template-file-path: ./ecr-repository.yaml
-stack-name: ct-ecr-stack
+template-file-path: ./main-stack.yaml
+stack-name: ct-main-stack
 tags:
-    Name: "ct-development-ecr-automated"
+    Name: "ct-development-main-automated"
     Project: "ct-aws-cfn-sync"
 parameters:
-    RepositoryName: "ct-nginx-app"
+    KeyName: "your-key-pair-name"
+    ECRRepositoryName: "ct-nginx-app"
+    ECSClusterName: "ct-ecs-cluster"
 # # ECS Cluster for container deployment
 # ecs-cluster:
 #   template-file-path: ./ecs-cluster.yaml
