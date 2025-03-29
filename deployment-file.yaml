@@ -7,9 +7,9 @@ tags:
 parameters:
     ECRRepositoryName: "ct-nginx-app"
     ECSClusterName: "ct-ecs-cluster"
-    VpcId: "vpc-0df0f7a9a3a9d39ad"
-    Subnet1: "subnet-07b8d4de7cbfd9d80"
-    Subnet2: "subnet-0aa4e302da3a8b2e3"
+    VpcId: "vpc-0024a1a5be8a956f4"
+    Subnet1: "subnet-000c94e10132347e1"
+    Subnet2: "subnet-004f125288c161a98"
 # # ECS Cluster for container deployment
 # ecs-cluster:
 #   template-file-path: ./ecs-cluster.yaml

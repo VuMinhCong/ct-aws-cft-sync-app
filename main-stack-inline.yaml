@@ -15,17 +15,17 @@ Parameters:
   VpcId:
     Type: String
     Description: 'VPC ID for the security group'
-    Default: 'vpc-0df0f7a9a3a9d39ad'
+    Default: 'vpc-0024a1a5be8a956f4'
   
   Subnet1:
     Type: String
     Description: 'First subnet ID for the ECS tasks'
-    Default: 'subnet-07b8d4de7cbfd9d80'
+    Default: 'subnet-000c94e10132347e1'
   
   Subnet2:
     Type: String
     Description: 'Second subnet ID for the ECS tasks'
-    Default: 'subnet-0aa4e302da3a8b2e3'
+    Default: 'subnet-004f125288c161a98'
 
 Resources:
   # ECR Repository
