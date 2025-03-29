@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'IAM permissions for CloudFormation service role'
+
+Resources:
+  CloudFormationServicePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy for CloudFormation service role to deploy resources
+      ManagedPolicyName: CtCfnSyncAdditionalPerms
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          # EC2 Key Pair permissions
+          - Effect: Allow
+            Action:
+              - 'ec2:DescribeKeyPairs'
+            Resource: '*'
+          
+          # ECR permissions  
+          - Effect: Allow
+            Action:
+              - 'ecr:CreateRepository'
+              - 'ecr:DeleteRepository'
+              - 'ecr:DescribeRepositories'
+              - 'ecr:PutLifecyclePolicy'
+              - 'ecr:GetLifecyclePolicy'
+              - 'ecr:DeleteLifecyclePolicy'
+              - 'ecr:TagResource'
+              - 'ecr:UntagResource'
+              - 'ecr:GetAuthorizationToken'
+              - 'ecr:InitiateLayerUpload'
+              - 'ecr:UploadLayerPart'
+              - 'ecr:CompleteLayerUpload'
+              - 'ecr:PutImage'
+              - 'ecr:BatchCheckLayerAvailability'
+              - 'ecr:BatchGetImage'
+            Resource: '*'
+          
+          # ECS permissions
+          - Effect: Allow
+            Action:
+              - 'ecs:CreateCluster'
+              - 'ecs:DeleteCluster'
+              - 'ecs:DescribeClusters'
+              - 'ecs:RegisterTaskDefinition'
+              - 'ecs:DeregisterTaskDefinition'
+              - 'ecs:DescribeTaskDefinition'
+              - 'ecs:CreateService'
+              - 'ecs:UpdateService'
+              - 'ecs:DeleteService'
+              - 'ecs:DescribeServices'
+            Resource: '*'
+          
+          # Additional required permissions for task execution
+          - Effect: Allow
+            Action:
+              - 'iam:PassRole'
+              - 'iam:GetRole'
+              - 'iam:CreateRole'
+              - 'iam:DeleteRole'
+              - 'iam:PutRolePolicy'
+              - 'iam:DeleteRolePolicy'
+              - 'iam:AttachRolePolicy'
+              - 'iam:DetachRolePolicy'
+            Resource: '*'
+
+  RolePolicyAttachment:
+    Type: AWS::IAM::RolePolicyAttachment
+    Properties:
+      PolicyArn: !Ref CloudFormationServicePolicy
+      RoleName: 'CtCfnSyncGithubRole'
+
+Outputs:
+  PolicyArn:
+    Description: 'ARN of the new permissions policy'
+    Value: !Ref CloudFormationServicePolicy 

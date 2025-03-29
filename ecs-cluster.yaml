@@ -28,6 +28,14 @@ Parameters:
     Type: String
     Default: 'ecs-cluster'
     Description: Name of the ECS cluster
+  
+  KeyName:
+    Type: String
+    Description: SSH Key for ECS worker nodes (leave blank to disable SSH access)
+    Default: ""
+
+Conditions:
+  HasKeyName: !Not [!Equals [!Ref KeyName, ""]]
 
 Resources:
   # ECS Cluster

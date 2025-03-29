@@ -5,7 +5,6 @@ tags:
     Name: "ct-development-main-automated"
     Project: "ct-aws-cfn-sync"
 parameters:
-    KeyName: "your-key-pair-name"
     ECRRepositoryName: "ct-nginx-app"
     ECSClusterName: "ct-ecs-cluster"
 # # ECS Cluster for container deployment

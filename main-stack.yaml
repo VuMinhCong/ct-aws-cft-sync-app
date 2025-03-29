@@ -3,8 +3,9 @@ Description: 'Main CloudFormation template with nested stacks for VPC, ECR, and 
 
 Parameters:
   KeyName:
-    Type: AWS::EC2::KeyPair::KeyName
-    Description: EC2 Key Pair for SSH access
+    Type: String
+    Description: EC2 Key Pair for SSH access (leave blank if not needed)
+    Default: ""
   
   ECRRepositoryName:
     Type: String
@@ -16,16 +17,34 @@ Parameters:
     Default: 'ct-ecs-cluster'
     Description: Name of the ECS cluster
 
+Conditions:
+  HasKeyName: !Not [!Equals [!Ref KeyName, ""]]
+
 Resources:
-  # First deploy the IAM permissions needed for ECR
+  # First deploy the IAM permissions needed for the service role
   IAMPermissionsStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ./ecr-iam-policy.yaml
+      TemplateURL: ./iam-permissions.yaml
       TimeoutInMinutes: 10
       Tags:
         - Key: Name
           Value: ct-iam-permissions-stack
+        - Key: Project
+          Value: ct-aws-cfn-sync
+
+  # Then deploy the ECR repository (since it had the permission issue)
+  ECRStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: IAMPermissionsStack
+    Properties:
+      TemplateURL: ./ecr-repository.yaml
+      Parameters:
+        RepositoryName: !Ref ECRRepositoryName
+      TimeoutInMinutes: 10
+      Tags:
+        - Key: Name
+          Value: ct-development-ecr-automated
         - Key: Project
           Value: ct-aws-cfn-sync
 
@@ -35,27 +54,11 @@ Resources:
     Properties:
       TemplateURL: ./cfn-template.yaml
       Parameters:
-        KeyName: !Ref KeyName
+        KeyName: !If [HasKeyName, !Ref KeyName, ""]
       TimeoutInMinutes: 30
       Tags:
         - Key: Name
           Value: ct-development-vpc-automated
-        - Key: Project
-          Value: ct-aws-cfn-sync
-
-  # Deploy the ECR repository
-  ECRStack:
-    Type: AWS::CloudFormation::Stack
-    DependsOn: 
-      - IAMPermissionsStack
-    Properties:
-      TemplateURL: ./ecr-repository.yaml
-      Parameters:
-        RepositoryName: !Ref ECRRepositoryName
-      TimeoutInMinutes: 10
-      Tags:
-        - Key: Name
-          Value: ct-development-ecr-automated
         - Key: Project
           Value: ct-aws-cfn-sync
 
