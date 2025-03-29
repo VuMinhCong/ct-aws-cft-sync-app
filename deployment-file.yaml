@@ -1,10 +1,3 @@
-# VPC and basic infrastructure
-vpc-infrastructure:
-  template-file-path: ./cfn-template.yaml
-  stack-name: ct-vpc-stack
-  tags:
-    Name: 'ct-deverlopment-cfn-automated'
-    Project: 'ct-aws-cfn-sync'
 
 # ECR Repository for Docker images
 ecr-repository:
