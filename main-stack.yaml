@@ -26,23 +26,13 @@ Parameters:
     Type: String
     Description: 'Second subnet ID for the ECS tasks'
     Default: 'subnet-0aa4e302da3a8b2e3'
-  
-  S3BucketName:
-    Type: String
-    Description: 'S3 bucket containing nested stack templates'
-    Default: 'ct-cfn-templates'
-  
-  S3KeyPrefix:
-    Type: String
-    Description: 'S3 key prefix for nested stack templates'
-    Default: 'templates'
 
 Resources:
   # ECR Repository Stack
   ECRStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub 'https://${S3BucketName}.s3.amazonaws.com/${S3KeyPrefix}/ecr-repository.yaml'
+      TemplateURL: ecr-repository.yaml
       Parameters:
         RepositoryName: !Ref ECRRepositoryName
       TimeoutInMinutes: 10
@@ -57,7 +47,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: ECRStack
     Properties:
-      TemplateURL: !Sub 'https://${S3BucketName}.s3.amazonaws.com/${S3KeyPrefix}/ecs-cluster.yaml'
+      TemplateURL: ecs-cluster.yaml
       Parameters:
         ClusterName: !Ref ECSClusterName
         ContainerImage: !Sub '${ECRStack.Outputs.RepositoryURI}:latest'
