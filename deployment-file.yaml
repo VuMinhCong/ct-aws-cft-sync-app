@@ -1,25 +1,22 @@
-
 # ECR Repository for Docker images
-ecr-repository:
-  template-file-path: ./ecr-repository.yaml
-  stack-name: ct-ecr-stack
-  tags:
-    Name: 'ct-development-ecr-automated'
-    Project: 'ct-aws-cfn-sync'
-  parameters:
-    RepositoryName: 'ct-nginx-app'
-
-# ECS Cluster for container deployment
-ecs-cluster:
-  template-file-path: ./ecs-cluster.yaml
-  stack-name: ct-ecs-stack
-  tags:
-    Name: 'ct-development-ecs-automated'
-    Project: 'ct-aws-cfn-sync'
-  parameters:
-    ClusterName: 'ct-ecs-cluster'
-    ContainerImage: '${ECR_REPOSITORY_URI}:latest'
-    # These will be populated dynamically during deployment
-    # VpcId: ${VPC_ID}
-    # PublicSubnet1Id: ${PUBLIC_SUBNET_1}
-    # PublicSubnet2Id: ${PUBLIC_SUBNET_2}
+template-file-path: ./ecr-repository.yaml
+stack-name: ct-ecr-stack
+tags:
+    Name: "ct-development-ecr-automated"
+    Project: "ct-aws-cfn-sync"
+parameters:
+    RepositoryName: "ct-nginx-app"
+# # ECS Cluster for container deployment
+# ecs-cluster:
+#   template-file-path: ./ecs-cluster.yaml
+#   stack-name: ct-ecs-stack
+#   tags:
+#     Name: 'ct-development-ecs-automated'
+#     Project: 'ct-aws-cfn-sync'
+#   parameters:
+#     ClusterName: 'ct-ecs-cluster'
+#     ContainerImage: '${ECR_REPOSITORY_URI}:latest'
+# These will be populated dynamically during deployment
+# VpcId: ${VPC_ID}
+# PublicSubnet1Id: ${PUBLIC_SUBNET_1}
+# PublicSubnet2Id: ${PUBLIC_SUBNET_2}
