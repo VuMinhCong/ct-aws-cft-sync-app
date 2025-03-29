@@ -1,8 +1,8 @@
 # ECR Repository for Docker images
-template-file-path: ./main-stack.yaml
-stack-name: ct-nested-stack
+template-file-path: ./main-stack-inline.yaml
+stack-name: ct-inline-stack
 tags:
-    Name: "ct-development-nested-automated"
+    Name: "ct-development-inline-automated"
     Project: "ct-aws-cfn-sync"
 parameters:
     ECRRepositoryName: "ct-nginx-app"
