@@ -1,0 +1,125 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template for a basic Amazon ECS cluster'
+
+Parameters:
+  ClusterName:
+    Type: String
+    Default: 'ecs-cluster'
+    Description: 'Name of the ECS cluster'
+  
+  ContainerImage:
+    Type: String
+    Default: 'nginx:latest'
+    Description: 'Docker image to use for the ECS task'
+  
+  ContainerPort:
+    Type: Number
+    Default: 80
+    Description: 'Port that the container exposes'
+  
+  Subnet1:
+    Type: String
+    Description: 'First subnet ID for the ECS tasks'
+  
+  Subnet2:
+    Type: String
+    Description: 'Second subnet ID for the ECS tasks'
+  
+  VpcId:
+    Type: String
+    Description: 'VPC ID for the security group'
+
+Resources:
+  # ECS Cluster
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref ClusterName
+  
+  # Log Group for ECS tasks
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/ecs/${ClusterName}'
+      RetentionInDays: 7
+  
+  # ECS Task Execution Role
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+  
+  # ECS Task Definition
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub '${ClusterName}-task'
+      Cpu: '256'
+      Memory: '512'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
+      ContainerDefinitions:
+        - Name: !Sub '${ClusterName}-container'
+          Image: !Ref ContainerImage
+          Essential: true
+          PortMappings:
+            - ContainerPort: !Ref ContainerPort
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+  
+  # Security Group for ECS tasks
+  ECSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for ECS tasks
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref ContainerPort
+          ToPort: !Ref ContainerPort
+          CidrIp: 0.0.0.0/0
+  
+  # ECS Service
+  ECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub '${ClusterName}-service'
+      Cluster: !Ref ECSCluster
+      TaskDefinition: !Ref TaskDefinition
+      LaunchType: FARGATE
+      DesiredCount: 1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref ECSSecurityGroup
+          Subnets:
+            - !Ref Subnet1
+            - !Ref Subnet2
+
+Outputs:
+  ClusterName:
+    Description: 'Name of the ECS cluster'
+    Value: !Ref ECSCluster
+  
+  ServiceName:
+    Description: 'Name of the ECS service'
+    Value: !GetAtt ECSService.Name
+  
+  TaskDefinitionArn:
+    Description: 'ARN of the task definition'
+    Value: !Ref TaskDefinition 
